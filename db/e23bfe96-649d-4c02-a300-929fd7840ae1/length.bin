@@ -1,1 +1,0 @@
-invalid type: string "---\n\n## 5. よく使われるセキュリティ技術・用語\n\n### 認証・認可\n- ID / パスワード\n- MFA（多要素認証）\n- OAuth 2.0 / OpenID Connect\n- RBAC / ABAC\n\n---\n\n### 暗号技術\n- TLS / HTTPS\n- ハッシュ（SHA-256）\n- 公開鍵暗号 / 共通鍵暗号\n\n---\n\n### クラウドセキュリティ\n- IAM\n- セキュリティグループ
