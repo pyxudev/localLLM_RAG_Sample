@@ -1,4 +1,5 @@
 import os
+from tqdm import tqdm
 
 # Refer: https://qiita.com/shiozaki/items/63447ec6617ded9840b3
 # "Pydantic V1 functionality" という文字列を含む UserWarning を無視する
@@ -8,7 +9,7 @@ warnings.filterwarnings("ignore", message=".*Pydantic V1 functionality.*")
 
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.document_loaders import TextLoader
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain_text_splitters  import RecursiveCharacterTextSplitter
 from langchain_ollama import OllamaEmbeddings
 
@@ -20,6 +21,8 @@ DB_DIR = "./db"
 embeddings = OllamaEmbeddings(model="nomic-embed-text")
 
 docs = []
+
+print("Loading documents...")
 
 # PDF読み込み
 for file in os.listdir(PDF_DIR):
@@ -52,11 +55,16 @@ splits = splitter.split_documents(docs)
 print(f"Split chunks: {len(splits)}")
 
 # VectorDB保存
-vectordb = Chroma.from_documents(
-    documents=splits,
-    embedding=embeddings,
+vectordb = Chroma(
+    embedding_function=embeddings,
     persist_directory=DB_DIR,
 )
 
-vectordb.persist()
+batch_size = 20
+texts = [doc.page_content for doc in splits]
+
+for i in tqdm(range(0, len(splits), batch_size), desc="Embedding"):
+    batch = splits[i:i + batch_size]
+    vectordb.add_documents(batch)
+
 print("Done. Vector DB saved.")
