@@ -20,7 +20,9 @@ DB_DIR = "./db"
 # embedding
 embeddings = OllamaEmbeddings(model="nomic-embed-text")
 
-docs = []
+all_docs = []
+pdfs = []
+mds = []
 
 print("Loading documents...")
 
@@ -29,9 +31,10 @@ for file in os.listdir(PDF_DIR):
     if file.endswith(".pdf"):
         path = os.path.join(PDF_DIR, file)
         loader = PyPDFLoader(path)
-        docs.extend(loader.load())
+        pdfs.extend(loader.load())
 
-print(f"Loaded PDF docs: {len(docs)}")
+print(f"Loaded PDF all_docs: {len(pdfs)}")
+all_docs.extend(pdfs)
 
 # Markdown読み込み
 for file in os.listdir(MD_DIR):
@@ -41,17 +44,18 @@ for file in os.listdir(MD_DIR):
             path,
             encoding="utf-8"
         )
-        docs.extend(loader.load())
+        mds.extend(loader.load())
 
-print(f"Loaded Markdown docs: {len(docs)}")
+print(f"Loaded Markdown all_docs: {len(mds)}")
+all_docs.extend(mds)
 
 # チャンク分割
 splitter = RecursiveCharacterTextSplitter(
-    chunk_size=500,
-    chunk_overlap=50,
+    chunk_size=300,
+    chunk_overlap=80,
 )
 
-splits = splitter.split_documents(docs)
+splits = splitter.split_documents(all_docs)
 print(f"Split chunks: {len(splits)}")
 
 # VectorDB保存
