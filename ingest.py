@@ -7,47 +7,41 @@ from tqdm import tqdm
 import warnings
 warnings.filterwarnings("ignore", message=".*Pydantic V1 functionality.*")
 
-from langchain_community.document_loaders import PyPDFLoader
-from langchain_community.document_loaders import TextLoader
+from langchain_community.document_loaders import (
+    Docx2txtLoader,
+    PyPDFLoader,
+    TextLoader
+)
 from langchain_chroma import Chroma
 from langchain_text_splitters  import RecursiveCharacterTextSplitter
 from langchain_ollama import OllamaEmbeddings
 
+DOCX_DIR = "./docx"
 PDF_DIR = "./pdf"
 MD_DIR = "./md"
 DB_DIR = "./db"
 
 # embedding
+print("Start embedding")
 embeddings = OllamaEmbeddings(model="nomic-embed-text")
-
+loaders = {
+    ".pdf": PyPDFLoader,
+    ".docx": Docx2txtLoader,
+    ".md": TextLoader
+}
 all_docs = []
-pdfs = []
-mds = []
 
 print("Loading documents...")
-
-# PDF読み込み
-for file in os.listdir(PDF_DIR):
-    if file.endswith(".pdf"):
-        path = os.path.join(PDF_DIR, file)
-        loader = PyPDFLoader(path)
-        pdfs.extend(loader.load())
-
-print(f"Loaded PDF all_docs: {len(pdfs)}")
-all_docs.extend(pdfs)
-
-# Markdown読み込み
-for file in os.listdir(MD_DIR):
-    if file.endswith(".md"):
-        path = os.path.join(MD_DIR, file)
-        loader = TextLoader(
-            path,
-            encoding="utf-8"
-        )
-        mds.extend(loader.load())
-
-print(f"Loaded Markdown all_docs: {len(mds)}")
-all_docs.extend(mds)
+for dir_path_list in [[PDF_DIR, "PDF"], [DOCX_DIR, "DOCX"], [MD_DIR, "MD"]]:
+    temp_list = []
+    for file in os.listdir(dir_path_list[0]):
+        ext = os.path.splitext(file)[1]
+        if ext in loaders:
+            path = os.path.join(dir_path_list[0], file)
+            loader = loaders[ext](path)
+            temp_list.extend(loader.load())
+    print(f"Loaded {dir_path_list[1]} files: {len(temp_list)}")
+    all_docs.extend(temp_list)
 
 # チャンク分割
 splitter = RecursiveCharacterTextSplitter(
