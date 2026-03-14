@@ -157,4 +157,5 @@ tqdm==4.67.3
 langchain-chroma==1.1.0
 langchain-ollama==1.0.1
 pypdf==6.8.0
+docx2txt==0.9
 marshmallow==3.26.2
