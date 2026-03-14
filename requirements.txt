@@ -158,4 +158,5 @@ langchain-chroma==1.1.0
 langchain-ollama==1.0.1
 pypdf==6.8.0
 docx2txt==0.9
+prompt-toolkit==3.0.52
 marshmallow==3.26.2
