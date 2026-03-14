@@ -152,3 +152,6 @@ xxhash==3.6.0
 yarl==1.23.0
 zipp==3.23.0
 zstandard==0.25.0
+langchain-community==0.4.1
+tqdm==4.67.3
+marshmallow==3.26.2
